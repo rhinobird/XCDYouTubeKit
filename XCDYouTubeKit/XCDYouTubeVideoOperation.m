@@ -31,7 +31,6 @@ typedef NS_ENUM(NSUInteger, XCDYouTubeRequestType) {
 
 @property (atomic, assign) BOOL isExecuting;
 @property (atomic, assign) BOOL isFinished;
-@property (atomic, readonly) dispatch_semaphore_t operationStartSemaphore;
 
 @property (atomic, strong) XCDYouTubeVideoWebpage *webpage;
 @property (atomic, strong) XCDYouTubeVideoWebpage *embedWebpage;
@@ -81,8 +80,6 @@ static NSError *YouTubeError(NSError *error, NSSet *regionsAllowed, NSString *la
 	_languageIdentifier = languageIdentifier ?: @"en";
 	
 	_session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration ephemeralSessionConfiguration]];
-	
-	_operationStartSemaphore = dispatch_semaphore_create(0);
 	
 	return self;
 }
@@ -313,8 +310,6 @@ static NSError *YouTubeError(NSError *error, NSSet *regionsAllowed, NSString *la
 
 - (void) start
 {
-	dispatch_semaphore_signal(self.operationStartSemaphore);
-	
 	if (self.isCancelled)
 		return;
 	
@@ -342,8 +337,6 @@ static NSError *YouTubeError(NSError *error, NSSet *regionsAllowed, NSString *la
 	
 	[self.dataTask cancel];
 	
-	// Wait for `start` to be called in order to avoid this warning: *** XCDYouTubeVideoOperation 0x7f8b18c84880 went isFinished=YES without being started by the queue it is in
-	dispatch_semaphore_wait(self.operationStartSemaphore, dispatch_time(DISPATCH_TIME_NOW, (int64_t)(200 * NSEC_PER_MSEC)));
 	[self finish];
 }
 
