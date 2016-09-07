@@ -34,7 +34,6 @@ typedef NS_ENUM(NSUInteger, XCDYouTubeRequestType) {
 
 @property (atomic, strong) XCDYouTubeVideoWebpage *webpage;
 @property (atomic, strong) XCDYouTubeVideoWebpage *embedWebpage;
-@property (atomic, strong) XCDYouTubePlayerScript *playerScript;
 @property (atomic, strong) XCDYouTubeVideo *noStreamVideo;
 @property (atomic, strong) NSError *lastError;
 @property (atomic, strong) NSError *youTubeError; // Error actually coming from the YouTube API, i.e. explicit and localized error
@@ -84,6 +83,16 @@ static NSError *YouTubeError(NSError *error, NSSet *regionsAllowed, NSString *la
 	return self;
 }
 
+- (instancetype) initWithVideoIdentifier:(NSString *)videoIdentifier languageIdentifier:(NSString *)languageIdentifier playerScript:(XCDYouTubePlayerScript *)playerScript
+{
+	if (!(self = [self initWithVideoIdentifier:videoIdentifier languageIdentifier:languageIdentifier]))
+		return nil; // LCOV_EXCL_LINE
+	
+    _playerScript = playerScript;
+	
+	return self;
+}
+
 #pragma mark - Requests
 
 - (void) startNextRequest
@@ -97,7 +106,7 @@ static NSError *YouTubeError(NSError *error, NSSet *regionsAllowed, NSString *la
 	}
 	else
 	{
-		[self startWatchPageRequest];
+        [self startWatchPageRequest];
 	}
 }
 
@@ -216,10 +225,14 @@ static NSError *YouTubeError(NSError *error, NSSet *regionsAllowed, NSString *la
 	XCDYouTubeLogDebug(@"Handling web page response");
 	
 	self.webpage = [[XCDYouTubeVideoWebpage alloc] initWithHTMLString:html];
-	
+    
 	if (self.webpage.javaScriptPlayerURL)
 	{
-		[self startRequestWithURL:self.webpage.javaScriptPlayerURL type:XCDYouTubeRequestTypeJavaScriptPlayer];
+        if (self.playerScript) {
+            [self handleJavaScriptPlayerWithScript:nil];
+        } else {
+            [self startRequestWithURL:self.webpage.javaScriptPlayerURL type:XCDYouTubeRequestTypeJavaScriptPlayer];
+        }
 	}
 	else
 	{
@@ -254,8 +267,10 @@ static NSError *YouTubeError(NSError *error, NSSet *regionsAllowed, NSString *la
 - (void) handleJavaScriptPlayerWithScript:(NSString *)script
 {
 	XCDYouTubeLogDebug(@"Handling JavaScript player response");
-	
-	self.playerScript = [[XCDYouTubePlayerScript alloc] initWithString:script];
+
+    if (!self.playerScript && script) {
+        self.playerScript = [[XCDYouTubePlayerScript alloc] initWithString:script];
+    }
 	
 	if (self.webpage.isAgeRestricted)
 	{

@@ -15,6 +15,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class XCDYouTubePlayerScript;
+
 /**
  *  XCDYouTubeVideoOperation is a subclass of `NSOperation` that connects to the YouTube API and parse the response.
  *
@@ -38,6 +40,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (instancetype) initWithVideoIdentifier:(NSString *)videoIdentifier languageIdentifier:(nullable NSString *)languageIdentifier;
 
+- (instancetype) initWithVideoIdentifier:(NSString *)videoIdentifier languageIdentifier:(nullable NSString *)languageIdentifier playerScript:(nullable XCDYouTubePlayerScript *)playerScript;
+
 /**
  *  --------------------------------
  *  @name Accessing operation result
@@ -56,6 +60,8 @@ NS_ASSUME_NONNULL_BEGIN
  *  Returns nil if the operation is not yet finished or if it was canceled.
  */
 @property (atomic, readonly, nullable) XCDYouTubeVideo *video;
+
+@property (atomic, strong) XCDYouTubePlayerScript *playerScript;
 
 @end
 

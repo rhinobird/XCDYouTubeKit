@@ -17,6 +17,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class XCDYouTubePlayerScript;
+
 /**
  *  The `XCDYouTubeClient` class is responsible for interacting with the YouTube API. Given a YouTube video identifier, you will get video information with the `<-getVideoWithIdentifier:completionHandler:>` method.
  *
@@ -58,6 +60,8 @@ NS_ASSUME_NONNULL_BEGIN
  *  @see -initWithLanguageIdentifier:
  */
 @property (nonatomic, readonly) NSString *languageIdentifier;
+
+@property (atomic, strong) XCDYouTubePlayerScript *playerScript;
 
 /**
  *  --------------------------------------

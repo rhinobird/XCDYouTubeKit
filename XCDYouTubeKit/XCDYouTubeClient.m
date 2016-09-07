@@ -54,7 +54,7 @@
 	if (!completionHandler)
 		@throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"The `completionHandler` argument must not be nil." userInfo:nil];
 	
-	XCDYouTubeVideoOperation *operation = [[XCDYouTubeVideoOperation alloc] initWithVideoIdentifier:videoIdentifier languageIdentifier:self.languageIdentifier];
+	XCDYouTubeVideoOperation *operation = [[XCDYouTubeVideoOperation alloc] initWithVideoIdentifier:videoIdentifier languageIdentifier:self.languageIdentifier playerScript:self.playerScript];
 	operation.completionBlock = ^{
 		[[NSOperationQueue mainQueue] addOperationWithBlock:^{
 #pragma clang diagnostic push
@@ -62,6 +62,7 @@
 			if (operation.video || operation.error)
 			{
 				NSAssert(!(operation.video && operation.error), @"One of `video` or `error` must be nil.");
+                self.playerScript = operation.playerScript;
 				completionHandler(operation.video, operation.error);
 			}
 			else
