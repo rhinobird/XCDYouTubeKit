@@ -82,8 +82,11 @@
 		if ([jsAssets isKindOfClass:[NSString class]])
 		{
 			NSString *javaScriptPlayerURLString = jsAssets;
-			if ([jsAssets hasPrefix:@"//"])
+			if ([jsAssets hasPrefix:@"//"]) {
 				javaScriptPlayerURLString = [@"https:" stringByAppendingString:jsAssets];
+			} else if ([jsAssets hasPrefix:@"/"]) {
+				javaScriptPlayerURLString = [@"https://youtube.com" stringByAppendingString:jsAssets];
+			}
 			
 			_javaScriptPlayerURL = [NSURL URLWithString:javaScriptPlayerURLString];
 		}
